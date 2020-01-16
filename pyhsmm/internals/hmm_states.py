@@ -94,14 +94,14 @@ class _StatesBase(with_metaclass(abc.ABCMeta, object)):
         self._normalizer = None
 
     @property
-    def aBl(self):
+    def aBl(self): # log likelihoods of all observations given all possible states, emission potentials
         if self._aBl is None:
             data = self.data
 
-            aBl = self._aBl = np.empty((data.shape[0],self.num_states))
+            aBl = self._aBl = np.empty((data.shape[0],self.num_states)) # what is this nonsense, why double variable?
             for idx, obs_distn in enumerate(self.obs_distns):
-                aBl[:,idx] = obs_distn.log_likelihood(data).ravel()
-            aBl[np.isnan(aBl).any(1)] = 0.
+                aBl[:,idx] = obs_distn.log_likelihood(data).ravel() # ravel flattens array
+            aBl[np.isnan(aBl).any(1)] = 0. # sweet code, sets all rows which contain nan to 0
 
         return self._aBl
 
