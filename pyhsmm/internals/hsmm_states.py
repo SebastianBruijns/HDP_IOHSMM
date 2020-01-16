@@ -511,6 +511,8 @@ class HSMMStatesEigen(HSMMStatesPython):
         assert not np.isnan(betal).any()
         assert not np.isnan(betastarl).any()
 
+        print(betal)
+
         if not self.left_censoring:
             self._normalizer = logsumexp(np.log(self.pi_0) + betastarl[0])
         else:
