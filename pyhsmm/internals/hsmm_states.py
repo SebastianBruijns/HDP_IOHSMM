@@ -232,6 +232,7 @@ class HSMMStatesPython(_StatesBase):
         return alphal, alphastarl
 
     def messages_backwards(self):
+        print('this doesn\'t happen') # too bad really
         betal, betastarl, loglike = hsmm_messages_backwards_log(
                 self.trans_potentials,
                 np.log(self.pi_0),
@@ -501,6 +502,8 @@ class HSMMStatesEigen(HSMMStatesPython):
         # NOTE: np.maximum calls are because the C++ code doesn't do
         # np.logaddexp(-inf,-inf) = -inf, it likes nans instead
         from pyhsmm.internals.hsmm_messages_interface import messages_backwards_log
+        # aBl are emission log probs, aDl are log likelihoods of durations,
+        # aDsl are log probs of survival func of durations
         betal, betastarl = messages_backwards_log(
                 np.maximum(self.trans_matrix,1e-50),self.aBl,np.maximum(self.aDl,-1000000),
                 self.aDsl,np.empty_like(self.aBl),np.empty_like(self.aBl),
