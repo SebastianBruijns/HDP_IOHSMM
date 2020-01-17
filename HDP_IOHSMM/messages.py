@@ -1,4 +1,5 @@
 import numpy as np
+from pybasicbayes import negative
 
 x = None
 
@@ -21,4 +22,4 @@ def B_star(i, t):
     temp = 0
     for d in range(1, T - t + 1):
         temp += B(i, t + d) * duration[i](d) * np.prod(emissions[i](observations[t+1:d+t+1]))
-    temp +=
+    temp += (1 - np.sum(duration[i](range(1, T - t + 1)))) * np.prod(emissions[i](observations[t+1:]))
