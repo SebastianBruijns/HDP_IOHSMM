@@ -83,6 +83,7 @@ class _HMMTransitionsGibbs(_HMMTransitionsBase):
                 else trans_counts
         for distn, counts in zip(self._row_distns,trans_counts):
             distn.resample(counts)
+        quit()
         return self
 
 class _HMMTransitionsMaxLikelihood(_HMMTransitionsBase):
@@ -161,6 +162,7 @@ class _ConcentrationResamplingMixin(object):
                 d.alpha_0 = alpha
 
     def resample(self,stateseqs=[],trans_counts=None):
+        print('everything') # so this doenst happen
         trans_counts = self._count_transitions(stateseqs) if trans_counts is None \
                 else trans_counts
 
@@ -311,6 +313,7 @@ class _WeakLimitHDPHMMTransitionsGibbs(
         _WeakLimitHDPHMMTransitionsBase,
         _HMMTransitionsGibbs):
     def resample(self,stateseqs=[],trans_counts=None,ms=None):
+        print('hmm_resample _WeakLimitHDPHMMTransitionsGibbs ________________')
         trans_counts = self._count_transitions(stateseqs) if trans_counts is None \
                 else trans_counts
         ms = self._get_m(trans_counts) if ms is None else ms
@@ -367,6 +370,7 @@ class _WeakLimitHDPHMMTransitionsConcBase(_WeakLimitHDPHMMTransitionsBase):
 class _WeakLimitHDPHMMTransitionsConcGibbs(
         _WeakLimitHDPHMMTransitionsConcBase,_WeakLimitHDPHMMTransitionsGibbs):
     def resample(self,stateseqs=[],trans_counts=None,ms=None):
+        print('nooo_:___________________________________________________')
         trans_counts = self._count_transitions(stateseqs) if trans_counts is None \
                 else trans_counts
         ms = self._get_m(trans_counts) if ms is None else ms
@@ -581,4 +585,3 @@ class _DATruncHDPHSMMTransitionsSVI(_DATruncHDPHMMTransitionsSVI,_HSMMTransition
 
 class DATruncHDPHSMMTransitions(_DATruncHDPHSMMTransitionsSVI):
     pass
-

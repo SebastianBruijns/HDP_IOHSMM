@@ -1120,7 +1120,7 @@ def hsmm_sample_forwards_log(
     while t < T:
         ## sample the state
         nextstate_distn_log = nextstate_unsmoothed + betastarl[t]
-        nextstate_distn = np.exp(nextstate_distn_log - logsumexp(nextstate_distn_log))
+        nextstate_distn = np.exp(nextstate_distn_log - logsumexp(nextstate_distn_log)) # the minus is normalization
         assert nextstate_distn.sum() > 0
         state = sample_discrete(nextstate_distn)
 

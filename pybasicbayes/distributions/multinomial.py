@@ -103,9 +103,9 @@ class Categorical(GibbsSampling, MeanField, MeanFieldSVI, MaxLikelihood, MAP):
     ### Gibbs sampling
 
     def resample(self,data=[],counts=None):
-        counts = self._get_statistics(data) if counts is None else counts
+        counts = self._get_statistics(data) if counts is None else counts # this is Multinomial's get_statistics
         self.weights = np.random.dirichlet(self.alphav_0 + counts)
-        np.clip(self.weights, np.spacing(1.), np.inf, out=self.weights)
+        np.clip(self.weights, np.spacing(1.), np.inf, out=self.weights) # they shouldn't even really be above 1, not to mention infinity
         # NOTE: next line is so we can use Gibbs sampling to initialize mean field
         self._alpha_mf = self.weights * self.alphav_0.sum()
         assert (self._alpha_mf >= 0.).all()
@@ -278,6 +278,7 @@ class Multinomial(Categorical):
         return np.random.multinomial(N, self.weights, size=size)
 
     def _get_statistics(self,data,K=None):
+        print('hhmmm1')
         K = K if K else self.K
         if isinstance(data,np.ndarray):
             return np.atleast_2d(data).sum(0)
