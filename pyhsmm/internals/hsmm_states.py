@@ -504,14 +504,25 @@ class HSMMStatesEigen(HSMMStatesPython):
         from pyhsmm.internals.hsmm_messages_interface import messages_backwards_log
         # aBl are emission log probs, aDl are log likelihoods of durations,
         # aDsl are log probs of survival func of durations
-        betal, betastarl = messages_backwards_log(
+        betal, betastarl = messages_backwards_log( # !!! trans_mat is not logged !!!
                 np.maximum(self.trans_matrix,1e-50),self.aBl,np.maximum(self.aDl,-1000000),
                 self.aDsl,np.empty_like(self.aBl),np.empty_like(self.aBl),
                 self.right_censoring,self.trunc if self.trunc is not None else self.T)
         assert not np.isnan(betal).any()
         assert not np.isnan(betastarl).any()
+        print(betal[-2])
+        print(betastarl[-2])
+        """print('abl') # proof that betastarl[-1] == self.aBl[-1]
+        print(betastarl[-1] - self.aBl[-1])"""
 
-        print(betal)
+
+        my_betal, my_betastarl = self.my_messages_backwards_log(
+                np.maximum(self.trans_matrix,1e-50), self.aBl, np.maximum(self.aDl,-1000000), self.aDsl)
+
+        print('diffs')
+        print(np.sum( np.abs(betal[-1] - my_betal[-1])))
+        print(np.sum( np.abs(betastarl[-1] - my_betastarl[-1])))
+        quit()
 
         if not self.left_censoring:
             self._normalizer = logsumexp(np.log(self.pi_0) + betastarl[0])
@@ -519,6 +530,43 @@ class HSMMStatesEigen(HSMMStatesPython):
             raise NotImplementedError
 
         return betal, betastarl
+
+    def my_messages_backwards_log(self, trans_mat, log_obs, log_durs, log_survivals):
+        betal = np.empty_like(log_obs)
+        betastarl = np.empty_like(log_obs)
+        betal[-1] = 1
+        betastarl[-1] = np.exp(log_obs[-1]) # empirical fact, might be censoring term
+        S = betal.shape[1]
+        T = betal.shape[0]
+
+
+        #print(np.exp(log_durs[1]) + np.exp(log_durs[0]) + np.exp(log_survivals[1])) # this is how it works
+
+        print('start')
+        for t in range(T - 1, 0, -1):
+            for i in range(S):
+                temp = 0
+                for d in range(1, T - t + 1):
+                    temp += betal[t + d - 1, i] * np.exp(log_durs[d - 1, i]) * np.prod(np.exp(log_obs[t:t + d, i])) # durs might start at 1
+
+                temp += np.exp(log_survivals[T - t - 1, i]) * np.prod(np.exp(log_obs[t:, i])) # depends on coding of sf
+                betastarl[t - 1, i] = temp
+
+                for j in range(S):
+                    betal[t - 1, i] += betastarl[t - 1, j] * trans_mat[i, j]
+
+            print(t)
+            if t == T-2:
+                print(np.log(betal[51]))
+                print(np.log(betastarl[51]))
+                print(np.log(betal[50]))
+                print(np.log(betastarl[50]))
+                quit()
+
+
+        print(np.min(betal))
+        print(np.min(betastarl))
+        return np.log(betal), np.log(betastarl)
 
     def messages_backwards_python(self):
         return super(HSMMStatesEigen,self).messages_backwards()

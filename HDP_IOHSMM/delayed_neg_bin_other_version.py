@@ -13,13 +13,14 @@ seeds = [17]#, 16] 17
 np.random.seed(4)
 hsmm = HSMM(1)
 hsmm.init_noise_test(means=1, delta_t=0.1)
-n_obs = 1000
+n_obs = 50
 data, ll, states = hsmm.generate_n_obs(n_obs)
 print(ll)
+print(data.shape)
 states = np.array(states)
-print(np.mean(data[states == 0]))
-print(np.mean(data[states == 1]))
-print(np.mean(data[states == 2]))
+#print(np.mean(data[states == 0]))
+#print(np.mean(data[states == 1]))
+#print(np.mean(data[states == 2]))
 
 Nmax = 25
 obs_dim = data.shape[1]
