@@ -510,8 +510,7 @@ class HSMMStatesEigen(HSMMStatesPython):
                 self.right_censoring,self.trunc if self.trunc is not None else self.T)
         assert not np.isnan(betal).any()
         assert not np.isnan(betastarl).any()
-        print(betal[-2])
-        print(betastarl[-2])
+
         """print('abl') # proof that betastarl[-1] == self.aBl[-1]
         print(betastarl[-1] - self.aBl[-1])"""
 
@@ -520,9 +519,10 @@ class HSMMStatesEigen(HSMMStatesPython):
                 np.maximum(self.trans_matrix,1e-50), self.aBl, np.maximum(self.aDl,-1000000), self.aDsl)
 
         print('diffs')
-        print(np.sum( np.abs(betal[-1] - my_betal[-1])))
-        print(np.sum( np.abs(betastarl[-1] - my_betastarl[-1])))
-        quit()
+        print(np.sum( np.abs(betal - my_betal)))
+        print(np.sum( np.abs(betastarl - my_betastarl)))
+
+
 
         if not self.left_censoring:
             self._normalizer = logsumexp(np.log(self.pi_0) + betastarl[0])
@@ -532,8 +532,8 @@ class HSMMStatesEigen(HSMMStatesPython):
         return betal, betastarl
 
     def my_messages_backwards_log(self, trans_mat, log_obs, log_durs, log_survivals):
-        betal = np.empty_like(log_obs)
-        betastarl = np.empty_like(log_obs)
+        betal = np.zeros_like(log_obs) # 0's here are important because of += later
+        betastarl = np.zeros_like(log_obs)
         betal[-1] = 1
         betastarl[-1] = np.exp(log_obs[-1]) # empirical fact, might be censoring term
         S = betal.shape[1]
@@ -552,20 +552,10 @@ class HSMMStatesEigen(HSMMStatesPython):
                 temp += np.exp(log_survivals[T - t - 1, i]) * np.prod(np.exp(log_obs[t:, i])) # depends on coding of sf
                 betastarl[t - 1, i] = temp
 
+            for i in range(S):
                 for j in range(S):
                     betal[t - 1, i] += betastarl[t - 1, j] * trans_mat[i, j]
 
-            print(t)
-            if t == T-2:
-                print(np.log(betal[51]))
-                print(np.log(betastarl[51]))
-                print(np.log(betal[50]))
-                print(np.log(betastarl[50]))
-                quit()
-
-
-        print(np.min(betal))
-        print(np.min(betastarl))
         return np.log(betal), np.log(betastarl)
 
     def messages_backwards_python(self):
