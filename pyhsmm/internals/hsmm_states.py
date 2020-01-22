@@ -515,6 +515,7 @@ class HSMMStatesEigen(HSMMStatesPython):
         print(betastarl[-1] - self.aBl[-1])"""
 
 
+        """ code to see that my python message passer works
         my_betal, my_betastarl = self.my_messages_backwards_log(
                 np.maximum(self.trans_matrix,1e-50), self.aBl, np.maximum(self.aDl,-1000000), self.aDsl)
 
@@ -522,7 +523,12 @@ class HSMMStatesEigen(HSMMStatesPython):
         print(np.sum( np.abs(betal - my_betal)))
         print(np.sum( np.abs(betastarl - my_betastarl)))
 
+        my_var = 52
+        print(betal[- my_var])
+        print(betastarl[- my_var])
 
+        print(my_betal[- my_var])
+        print(my_betastarl[- my_var])"""
 
         if not self.left_censoring:
             self._normalizer = logsumexp(np.log(self.pi_0) + betastarl[0])
@@ -535,7 +541,7 @@ class HSMMStatesEigen(HSMMStatesPython):
         betal = np.zeros_like(log_obs) # 0's here are important because of += later
         betastarl = np.zeros_like(log_obs)
         betal[-1] = 1
-        betastarl[-1] = np.exp(log_obs[-1]) # empirical fact, might be censoring term
+        betastarl[-1] = np.exp(log_obs[-1]) # empirical fact, might be censoring term -> I get it myself to, comes from marginalisation of all durations since survival func
         S = betal.shape[1]
         T = betal.shape[0]
 
@@ -550,11 +556,21 @@ class HSMMStatesEigen(HSMMStatesPython):
                     temp += betal[t + d - 1, i] * np.exp(log_durs[d - 1, i]) * np.prod(np.exp(log_obs[t:t + d, i])) # durs might start at 1
 
                 temp += np.exp(log_survivals[T - t - 1, i]) * np.prod(np.exp(log_obs[t:, i])) # depends on coding of sf
-                betastarl[t - 1, i] = temp
+                betastarl[t, i] = temp
 
             for i in range(S):
                 for j in range(S):
-                    betal[t - 1, i] += betastarl[t - 1, j] * trans_mat[i, j]
+                    betal[t - 1, i] += betastarl[t, j] * trans_mat[i, j]
+
+        # one last time, to fill last row o fbetastarl
+        t = 0
+        for i in range(S):
+            temp = 0
+            for d in range(1, T - t + 1):
+                temp += betal[t + d - 1, i] * np.exp(log_durs[d - 1, i]) * np.prod(np.exp(log_obs[t:t + d, i])) # durs might start at 1
+
+            temp += np.exp(log_survivals[T - t - 1, i]) * np.prod(np.exp(log_obs[t:, i])) # depends on coding of sf
+            betastarl[t, i] = temp
 
         return np.log(betal), np.log(betastarl)
 
