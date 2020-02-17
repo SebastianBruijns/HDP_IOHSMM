@@ -556,7 +556,7 @@ class GaussianFixedMean(_GaussianBase, GibbsSampling, MaxLikelihood):
 class GaussianFixedCov(_GaussianBase, GibbsSampling, MaxLikelihood):
     # See Gelman's Bayesian Data Analysis notation around Eq. 3.18, p. 85
     # in 2nd Edition. We replaced \Lambda_0 with sigma_0 since it is a prior
-    # *covariance* matrix rather than a precision matrix. 
+    # *covariance* matrix rather than a precision matrix.
     def __init__(self,mu=None,sigma=None,mu_0=None,sigma_0=None):
         self.mu = mu
 

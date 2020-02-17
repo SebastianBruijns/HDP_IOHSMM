@@ -439,12 +439,12 @@ class _HMMGibbsSampling(_HMMBase,ModelGibbsSampling):
     @line_profiled
     def resample_model(self,num_procs=0):
         self.resample_parameters()
-        self.resample_states(num_procs=num_procs)
+        self.resample_states(num_procs=num_procs) # done (roughly)
 
     @line_profiled
     def resample_parameters(self):
         self.resample_obs_distns()
-        self.resample_trans_distn()
+        self.resample_trans_distn() # done
         self.resample_init_state_distn()
 
     def resample_obs_distns(self):

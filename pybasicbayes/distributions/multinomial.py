@@ -278,7 +278,6 @@ class Multinomial(Categorical):
         return np.random.multinomial(N, self.weights, size=size)
 
     def _get_statistics(self,data,K=None):
-        print('hhmmm1')
         K = K if K else self.K
         if isinstance(data,np.ndarray):
             return np.atleast_2d(data).sum(0)

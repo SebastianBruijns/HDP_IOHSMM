@@ -22,7 +22,7 @@ states = np.array(states)
 #print(np.mean(data[states == 1]))
 #print(np.mean(data[states == 2]))
 
-Nmax = 4
+Nmax = 25
 obs_dim = data.shape[1]
 
 
